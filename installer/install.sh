@@ -11,7 +11,7 @@ for dep in $deps; do
 done
 
 if [ "${FAIL}" = "true" ]; then
-    exit
+    exit 1
 fi
 
 echo "All dependencies satisfied"
@@ -23,6 +23,7 @@ mkdir -p "${INSTALLPATH}/disks"
 
 echo "Copying lilik.sh to ${INSTALLPATH}..."
 cp lilik.sh "${INSTALLPATH}"
+chmod 700 "${INSTALLPATH}/lilik.sh"
 echo "Copying debian-preseed to ${INSTALLPATH}..."
 cp debian-preseed.iso "${INSTALLPATH}/disks"
 echo "Extracting openwrt-preseed.gz to ${INSTALLPATH}/disks..."
@@ -54,7 +55,7 @@ echo "Starting virtual network swtich..."
 echo "Starting firewall..."
 "${INSTALLPATH}/lilik.sh" fw start
 echo "Starting host installation..."
-echo "Please wait for installation to finish on the VM"
+echo -e "\033[1mPlease wait for installation to finish on the VM\033[0m"
 "${INSTALLPATH}/lilik.sh" host install
 echo "Rebooting host"
 "${INSTALLPATH}/lilik.sh" host start
@@ -67,14 +68,15 @@ case "${SET_SSH_YN}" in
     *)
         read -e -p "Confirm ssh key path: " -i "${SSH_KEY_PATH}" SET_KEY_PATH
         echo "Attaching virtual switch to host (sudo required)..."
-        "${INSTALLPATH}/lilik.sh" connect
+        "${INSTALLPATH}/lilik.sh" switch connect
         echo "Cleaning host keys for 10.150.40.1, 10.150.40.60"
-        ssh-keygen -R 10.150.40.1
-        ssh-keygen -R 10.150.40.60
-        echo "Copying key to firewall... provide default password 'pippopippo' when asked"
-        ssh-copy-id -i "${SSH_KEY_PATH}" root@10.151.40.1 
+        ssh-keygen -R 10.151.40.1
+        ssh-keygen -R 10.151.40.60
+        echo "Copying key to firewall..."
+        echo -e "\033[1mProvide default password 'pippopippo' when asked\033[0m"
+        ssh-copy-id -i "${SSH_KEY_PATH}" -o StrictHostKeyChecking=accept-new root@10.151.40.1
         echo "Copying key to host... provide default password 'pippopippo' when asked"
-        ssh-copy-id -i "${SSH_KEY_PATH}" root@10.151.40.60
+        ssh-copy-id -i "${SSH_KEY_PATH}" -o StrictHostKeyChecking=accept-new root@10.151.40.60
         echo "Detaching virtual switch from host..."
-        sudo "${INSTALLPATH}/lilik.sh" disconnect
+        "${INSTALLPATH}/lilik.sh" switch disconnect
 esac
