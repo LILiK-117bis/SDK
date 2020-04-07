@@ -18,14 +18,17 @@ The configured entities are the following:
 
 To install the current version SDK, simply run:
 
-    curl https://github.com/LILiK-117bis/SDK/releases/download/v0.1/liliksdk.sh | sh
+    wget https://github.com/LILiK-117bis/SDK/releases/download/v0.2-alpha/liliksdk.sh
+    sh liliksdk.sh
 
 The interactive installer will guide you.
 
-If you prefer you can download the compressed tarball [here] and
-proceed with installation running `./install.sh` after decompression.
+If you prefer to install from source, do the following
 
-[here]: https://github.com/LILiK-117bis/SDK/releases/download/v0.1/liliksdk.tar.gz
+	git clone https://github.com/LILiK-117bis/SDK.git
+	cd SDK
+	sh build.sh
+	sh liliksdk.sh
 
 ## Use
 
@@ -46,14 +49,22 @@ won't boot.
 
 ## Requirements
 
-- qemu
+Only for the installation process:
+
+- genisoimage
+- bsdtar
+- curl
+- sed
+
+To run Lilik SDK:
+
+- qemu (with foreign arch support)
 - vde2
-- tunctl
 
 On Debian you can satify the dependencies with:
 
-    sudo apt install qemu-kvm vde2
+    sudo apt install qemu-kvm vde2 bsdtar genisoimage curl sed
 
 Or in Arch and Manjaro you can use:
 
-    sudo pacman -S qemu qemu-arch-extra vde2
+    sudo pacman -S qemu qemu-arch-extra vde2 curl cdrtools libarchive sed

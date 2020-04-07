@@ -1,20 +1,11 @@
-tee liliksdk.sh <<EOF
-#!/bin/sh
-TMPDIR=\$(mktemp -d)
-mkdir -p \$TMPDIR
-chmod 700 \$TMPDIR
-ARCHIVE=\$(awk '/^__ARCHIVE_BELOW__/ {print NR + 1; exit 0; }' \$0)
-tail -n+\$ARCHIVE \$0 | tar x -C \$TMPDIR
-cd \$TMPDIR
-chmod 755 ./install.sh
-./install.sh && rm -rf \$TMPDIR || echo "Installation failed, try again running \${TMPDIR}/install.sh"
+base64 installer/openwrt-preseed.img.gz > openwrt.b64
+base64 installer/lilik.sh > lilik.sh.b64
+base64 preseed.cfg > preseed.cfg.b64
+sed \
+  -e '/LILIKSH_B64HERE$/ r lilik.sh.b64' \
+  -e '/OPENWRT_B64HERE$/ r openwrt.b64' \
+  -e '/PRESEED_B64HERE$/ r preseed.cfg.b64' \
+  installer/install_template.sh > liliksdk.sh
 
-exit 0
-
-__ARCHIVE_BELOW__
-EOF
-
-chmod +x liliksdk.sh
-tar cvf liliksdk.tar -C installer debian-preseed.iso install.sh lilik.sh openwrt-preseed.img.gz
-cat liliksdk.tar >> liliksdk.sh
-gzip liliksdk.tar
+rm openwrt.b64
+rm lilik.sh.b64

@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 
+INSTALL_PATH=<INSTALL_PATH>
 CONTROLLER_IF_NAME="lilik"
 CONTROLLER_IP_ADDR="10.151.40.210/24"
 VM_SUBNET="10.151.42.0/24"
 FW_IP_ADDR="10.151.40.1"
 
-cd $(dirname $0)
+cd ${INSTALL_PATH}
 
 switch() {
     case $1 in
